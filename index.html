@@ -6,76 +6,54 @@
   <title>VR Approval | ADmart Products</title>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <style>
-    /* 全域樣式 */
+    /* Global Styles */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Source Sans Pro', sans-serif; background: #f5f5f5; color: #393B3A; line-height: 1.6; }
     .hidden { display: none !important; }
 
-    /* 頁首 */
+    /* Header */
     .site-header { background: #fff; border-bottom: 1px solid #ddd; padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; }
     .site-header img { height: 50px; width: auto; }
     .contact-link { color: #AAC568; font-weight: 700; text-decoration: none; font-size: 14px; }
 
-    /* 主容器與 60/40 雙欄佈局 */
+    /* Main Layout */
     .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
     .content-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; align-items: start; }
-    
     @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
 
-    /* 卡片樣式 */
+    /* Cards */
     .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
     .card-header { background: #393B3A; color: #fff; padding: 12px 20px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
     .card-body { padding: 25px; }
 
-    /* 資訊列 (Pills) 樣式 */
-    .info-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; }
+    /* Pill Info */
     .pill { 
-        background: #AAC568;
-        color: #f0f0f0; 
-        padding: 6px 24px;
-        border-radius: 4px;
-        font-size: 22px;
-        font-weight: 600;
-        border: none;
+        background: #AAC568; color: #f0f0f0; padding: 6px 24px; border-radius: 4px;
+        font-size: 22px; font-weight: 600; display: inline-flex; align-items: center;
         box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-        display: flex;
-        align-items: center;
     }
-    .pill strong { 
-        color: #ffffff; 
-        margin-left: 8px;
-        font-weight: 800;
-        text-shadow: 1px 1px 0px rgba(0,0,0,0.15);
-    }
+    .pill strong { color: #ffffff; margin-left: 8px; font-weight: 800; }
 
-    /* 圖片預覽區域 */
-    .preview-box { background: #eee; border: 2px dashed #ccc; border-radius: 6px; min-height: 500px; display: flex; align-items: center; justify-content: center; position: relative; }
+    /* Preview Area */
+    .preview-box { background: #eee; border: 2px dashed #ccc; border-radius: 6px; min-height: 500px; display: flex; align-items: center; justify-content: center; }
     .preview-box img { max-width: 100%; height: auto; display: block; border-radius: 4px; }
     #placeholder { color: #999; font-weight: 600; }
 
-    /* 表單元件 */
+    /* Form Elements */
     .form-group { margin-bottom: 18px; }
     label { display: block; font-weight: 700; font-size: 12px; margin-bottom: 6px; color: #666; text-transform: uppercase; }
     .form-control { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; font-family: inherit; }
     textarea.form-control { height: 110px; resize: vertical; }
     
-    /* 按鈕 */
+    /* Buttons */
     .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 15px; text-align: center; text-decoration: none; }
     .btn-submit { background: #AAC568; color: #fff; border-bottom: 3px solid #8ba355; }
     .btn-submit:hover { background: #92ae50; transform: translateY(-1px); }
 
-    /* Overlays */
-    #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #393B3A; font-size: 18px; letter-spacing: 1px; }
-    
-    /* Blocked Overlay Styles */
-    #blocked-overlay { 
-      position: fixed; inset: 0; background: #fff; z-index: 1001; 
-      display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      text-align: center; padding: 30px;
-    }
-    .blocked-content h2 { color: #AAC568; font-size: 32px; margin-bottom: 15px; }
-    .blocked-content p { font-size: 18px; color: #393B3A; max-width: 500px; margin-bottom: 25px; }
+    /* Loading Overlay */
+    #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #393B3A; font-size: 18px; letter-spacing: 1px; text-align: center; padding: 20px; }
 
+    /* Success Screen */
     .success-screen { text-align: center; padding: 40px 0; }
     .success-screen h2 { color: #AAC568; margin-bottom: 10px; font-size: 28px; }
   </style>
@@ -83,15 +61,6 @@
 <body>
 
 <div id="loading-overlay">LOADING ORDER DETAILS...</div>
-
-<!-- <div id="blocked-overlay" class="hidden">
-  <div class="blocked-content">
-    <img src="https://admartproducts.com/content/webimg/admart_new_aminate.svg" alt="ADmart Logo" style="height:60px; margin-bottom:30px;">
-    <h2>Response Already Received</h2>
-    <p>We've already received a response for this VR Number. Your decision is currently being processed by our team.</p>
-    <p style="font-size: 14px; color: #888;">If you need to make changes, please contact <a href="mailto:art@admartproducts.com" style="color: #AAC568; font-weight: bold;">art@admartproducts.com</a></p>
-  </div>
-</div> -->
   
 <header class="site-header">
   <img src="https://admartproducts.com/content/webimg/admart_new_aminate.svg" alt="ADmart Logo">
@@ -107,7 +76,6 @@
         <div class="info-bar">
           <div class="pill">VR#:<strong id="info-job">---</strong></div>
         </div>
-
         <div class="preview-box">
           <img id="main-img" src="" alt="VR Preview" class="hidden">
           <p id="placeholder">Fetching VR from server...</p>
@@ -156,7 +124,6 @@
 
           <button type="submit" id="submit-btn" class="btn btn-submit">Submit My Response</button>
         </form>
-
       </div>
     </div>
 
@@ -170,45 +137,42 @@
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const pid = params.get('pid');
+    const loader = document.getElementById('loading-overlay');
 
     if (!pid) {
-      document.getElementById('loading-overlay').innerHTML = '❌ Error: Missing PID in URL.';
+      loader.innerHTML = '❌ Error: Missing PID in URL.<br><small>Please use the link provided in your email.</small>';
       return;
     }
 
-    // 1. 獲取訂單資料
+    // 1. Fetch Order Data
     fetch(`${N8N_GET_URL}?pid=${pid}`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => {
         const item = Array.isArray(data) ? data[0] : data;
 
-        // if (item.status === 'Order Placed' || item.status === 'Need Revise') {
-        //   document.getElementById('blocked-overlay').classList.remove('hidden');
-        //   document.getElementById('loading-overlay').classList.add('hidden');
-        //   return;
-        // }
-
+        // Populate VR Number
         document.getElementById('info-job').textContent = item.order_number || '---';
-        document.getElementById('info-po').textContent = item.po_number || '---';
         
+        // Handle Image
         if (item.preview_image) {
           const img = document.getElementById('main-img');
           img.src = item.preview_image;
-          img.classList.remove('hidden');
-          document.getElementById('placeholder').classList.add('hidden');
+          img.onload = () => {
+             img.classList.remove('hidden');
+             document.getElementById('placeholder').classList.add('hidden');
+             loader.classList.add('hidden'); // Hide loading once image is ready
+          };
         } else {
           document.getElementById('placeholder').textContent = 'No preview available.';
+          loader.classList.add('hidden');
         }
-
-        document.getElementById('loading-overlay').classList.add('hidden');
       })
       .catch(err => {
         console.error(err);
-        document.getElementById('blocked-overlay').classList.remove('hidden');
-        document.getElementById('loading-overlay').innerHTML = '❌ Error: Could not connect to server.';
+        loader.innerHTML = '❌ Error: Could not connect to server.<br><small>Please try refreshing or contact support.</small>';
       });
 
-    // 2. 提交表單邏輯 (JSON + Base64 修正版)
+    // 2. Submit Form
     document.getElementById('approval-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const submitBtn = document.getElementById('submit-btn');
@@ -219,7 +183,6 @@
       let base64File = null;
       let fileName = null;
 
-      // 如果有選擇檔案，轉換為 Base64
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         fileName = file.name;
@@ -230,7 +193,6 @@
         });
       }
 
-      // 構建 JSON 酬載
       const payload = {
         name: this.name.value,
         email: this.email.value,
@@ -247,12 +209,11 @@
         body: JSON.stringify(payload) 
       })
       .then(res => {
-        if (!res.ok) throw new Error('Submission failed');
+        if (!res.ok) throw new Error();
         document.getElementById('approval-form').classList.add('hidden');
         document.getElementById('success-screen').classList.remove('hidden');
       })
       .catch(err => {
-        console.error(err);
         alert('❌ Error: Could not submit your response.');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit My Response';
@@ -261,14 +222,14 @@
   });
 
   function handleStatusChange(val) {
-    const changesField = document.getElementById('changes-field');
-    const textarea = document.getElementById('change-textarea');
+    const field = document.getElementById('changes-field');
+    const area = document.getElementById('change-textarea');
     if (val === 'Changes Requested') {
-      changesField.classList.remove('hidden');
-      textarea.required = true;
+      field.classList.remove('hidden');
+      area.required = true;
     } else {
-      changesField.classList.add('hidden');
-      textarea.required = false;
+      field.classList.add('hidden');
+      area.required = false;
     }
   }
 </script>
