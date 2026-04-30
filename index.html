@@ -84,14 +84,14 @@
 
 <div id="loading-overlay">LOADING ORDER DETAILS...</div>
 
-<div id="blocked-overlay" class="hidden">
+<!-- <div id="blocked-overlay" class="hidden">
   <div class="blocked-content">
     <img src="https://admartproducts.com/content/webimg/admart_new_aminate.svg" alt="ADmart Logo" style="height:60px; margin-bottom:30px;">
     <h2>Response Already Received</h2>
     <p>We've already received a response for this VR Number. Your decision is currently being processed by our team.</p>
     <p style="font-size: 14px; color: #888;">If you need to make changes, please contact <a href="mailto:art@admartproducts.com" style="color: #AAC568; font-weight: bold;">art@admartproducts.com</a></p>
   </div>
-</div>
+</div> -->
   
 <header class="site-header">
   <img src="https://admartproducts.com/content/webimg/admart_new_aminate.svg" alt="ADmart Logo">
@@ -182,11 +182,11 @@
       .then(data => {
         const item = Array.isArray(data) ? data[0] : data;
 
-        if (item.status === 'Order Placed' || item.status === 'Need Revise') {
-          document.getElementById('blocked-overlay').classList.remove('hidden');
-          document.getElementById('loading-overlay').classList.add('hidden');
-          return;
-        }
+        // if (item.status === 'Order Placed' || item.status === 'Need Revise') {
+        //   document.getElementById('blocked-overlay').classList.remove('hidden');
+        //   document.getElementById('loading-overlay').classList.add('hidden');
+        //   return;
+        // }
 
         document.getElementById('info-job').textContent = item.order_number || '---';
         document.getElementById('info-po').textContent = item.po_number || '---';
