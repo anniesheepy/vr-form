@@ -105,7 +105,7 @@
 
           <div class="form-group">
             <label>Final Decision *</label>
-            <select name="status" class="form-control" required onchange="handleStatusChange(this.value)">
+            <select id="status-select" name="status" class="form-control" required onchange="handleStatusChange(this.value)">
               <option value="">-- Select --</option>
               <option value="Approved">✅ Looks good! I will send an official PO.</option>
               <option value="Changes Requested">🔄 Change Requested (Note: We provide up to 3 virtual revisions for free)</option>
@@ -115,7 +115,7 @@
           </div>
 
           <div id="changes-field" class="form-group hidden">
-            <label>Description of Changes *</label>
+            <label id="change-label">Description of Changes *</label>
             <textarea name="change_details" id="change-textarea" class="form-control" placeholder="Please specify what needs to be fixed..."></textarea>
           </div>
 
@@ -151,18 +151,15 @@
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => {
         const item = Array.isArray(data) ? data[0] : data;
-
-        // Populate VR Number
         document.getElementById('info-job').textContent = item.order_number || '---';
         
-        // Handle Image
         if (item.preview_image) {
           const img = document.getElementById('main-img');
           img.src = item.preview_image;
           img.onload = () => {
              img.classList.remove('hidden');
              document.getElementById('placeholder').classList.add('hidden');
-             loader.classList.add('hidden'); // Hide loading once image is ready
+             loader.classList.add('hidden');
           };
         } else {
           document.getElementById('placeholder').textContent = 'No preview available.';
@@ -223,29 +220,29 @@
     });
   });
 
-function handleStatusChange(val) {
-  const field = document.getElementById('changes-field');
-  const area = document.getElementById('change-textarea');
-  const label = field.querySelector('label');
+  // Global function for the onchange event
+  function handleStatusChange(val) {
+    const field = document.getElementById('changes-field');
+    const area = document.getElementById('change-textarea');
+    const label = document.getElementById('change-label');
 
-  // Check if either status is selected
-  if (val === 'Changes Requested' || val === 'Suggestion') {
-    field.classList.remove('hidden');
-    area.required = true;
+    if (val === 'Changes Requested' || val === 'Suggestion') {
+      field.classList.remove('hidden');
+      area.required = true;
 
-    // Optional: Update text to match the context
-    if (val === 'Suggestion') {
-      label.textContent = "What kind of product are you looking for? *";
-      area.placeholder = "Example: I need something in blue, or a lower price point...";
+      if (val === 'Suggestion') {
+        label.textContent = "What kind of product are you looking for? *";
+        area.placeholder = "Example: I need something in blue, or a lower price point...";
+      } else {
+        label.textContent = "Description of Changes *";
+        area.placeholder = "Please specify what needs to be fixed...";
+      }
     } else {
-      label.textContent = "Description of Changes *";
-      area.placeholder = "Please specify what needs to be fixed...";
+      field.classList.add('hidden');
+      area.required = false;
+      area.value = ""; // Clear content if user switches back to "Approved"
     }
-  } else {
-    field.classList.add('hidden');
-    area.required = false;
   }
-}
 </script>
 
 </body>
