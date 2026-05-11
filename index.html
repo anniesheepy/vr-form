@@ -171,41 +171,31 @@
         loader.innerHTML = '❌ Error: Could not connect to server.<br><small>Please try refreshing or contact support.</small>';
       });
 
-    // 2. Submit Form
+  // 2. Submit Form (Modified for Binary/FormData)
     document.getElementById('approval-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const submitBtn = document.getElementById('submit-btn');
       submitBtn.disabled = true;
       submitBtn.textContent = 'SUBMITTING...';
 
+      // 使用 FormData 來處理二進制檔案
+      const formData = new FormData();
+      formData.append('name', this.name.value);
+      formData.append('email', this.email.value);
+      formData.append('status', this.status.value);
+      formData.append('change_details', this.change_details.value);
+      formData.append('pid', pid);
+
       const fileInput = this.querySelector('input[name="file_attachment"]');
-      let base64File = null;
-      let fileName = null;
-
       if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        fileName = file.name;
-        base64File = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.readAsDataURL(file);
-        });
+        // 直接將 File 物件放入 FormData，這會產生 Binary 數據
+        formData.append('file_attachment', fileInput.files[0]); 
       }
-
-      const payload = {
-        name: this.name.value,
-        email: this.email.value,
-        status: this.status.value,
-        change_details: this.change_details.value,
-        pid: pid,
-        file_data: base64File,
-        file_name: fileName
-      };
 
       fetch(N8N_POST_URL, { 
         method: 'POST', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload) 
+        // 重要：使用 FormData 時，絕對不能手動設置 Content-Type 標頭
+        body: formData 
       })
       .then(res => {
         if (!res.ok) throw new Error();
@@ -218,7 +208,6 @@
         submitBtn.textContent = 'Submit My Response';
       });
     });
-  });
 
   // Global function for the onchange event
   function handleStatusChange(val) {
