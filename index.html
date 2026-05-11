@@ -107,8 +107,10 @@
             <label>Final Decision *</label>
             <select name="status" class="form-control" required onchange="handleStatusChange(this.value)">
               <option value="">-- Select --</option>
-              <option value="Approved">✅ Looks good ( I’d like to place an order)</option>
-              <option value="Changes Requested">🔄 Changes Requested</option>
+              <option value="Approved">✅ Looks good! I will send an official PO.</option>
+              <option value="Changes Requested">🔄 Change Requested (Note: We provide up to 3 virtual revisions for free)</option>
+              <option value="Suggestion">💡 Not quite right. I need another product suggestion.</option>
+              <option value="Waiting">⏳ Waiting for client response. Will follow up in a few days.</option>
             </select>
           </div>
 
