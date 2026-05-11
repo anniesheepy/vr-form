@@ -223,17 +223,29 @@
     });
   });
 
-  function handleStatusChange(val) {
-    const field = document.getElementById('changes-field');
-    const area = document.getElementById('change-textarea');
-    if (val === 'Changes Requested') {
-      field.classList.remove('hidden');
-      area.required = true;
+function handleStatusChange(val) {
+  const field = document.getElementById('changes-field');
+  const area = document.getElementById('change-textarea');
+  const label = field.querySelector('label');
+
+  // Check if either status is selected
+  if (val === 'Changes Requested' || val === 'Suggestion') {
+    field.classList.remove('hidden');
+    area.required = true;
+
+    // Optional: Update text to match the context
+    if (val === 'Suggestion') {
+      label.textContent = "What kind of product are you looking for? *";
+      area.placeholder = "Example: I need something in blue, or a lower price point...";
     } else {
-      field.classList.add('hidden');
-      area.required = false;
+      label.textContent = "Description of Changes *";
+      area.placeholder = "Please specify what needs to be fixed...";
     }
+  } else {
+    field.classList.add('hidden');
+    area.required = false;
   }
+}
 </script>
 
 </body>
