@@ -49,6 +49,7 @@
     .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 15px; text-align: center; text-decoration: none; }
     .btn-submit { background: #AAC568; color: #fff; border-bottom: 3px solid #8ba355; }
     .btn-submit:hover { background: #92ae50; transform: translateY(-1px); }
+    .btn-submit:disabled { background: #ccc; border-bottom: none; cursor: not-allowed; }
 
     /* Loading Overlay */
     #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #393B3A; font-size: 18px; letter-spacing: 1px; text-align: center; padding: 20px; }
@@ -73,7 +74,7 @@
     <div class="card">
       <div class="card-header">Virtual Preview</div>
       <div class="card-body">
-        <div class="info-bar">
+        <div class="info-bar" style="margin-bottom: 15px;">
           <div class="pill">VR#:<strong id="info-job">---</strong></div>
         </div>
         <div class="preview-box">
@@ -108,9 +109,9 @@
             <select id="status-select" name="status" class="form-control" required onchange="handleStatusChange(this.value)">
               <option value="">-- Select --</option>
               <option value="Approved">✅ Looks good! I will send an official PO.</option>
-              <option value="Changes Requested">🔄 Change Requested (Note: We provide up to 3 virtual revisions for free)</option>
-              <option value="Suggestion">💡 Not quite right. I need another product suggestion.</option>
-              <option value="Waiting">⏳ Waiting for client response. Will follow up in a few days.</option>
+              <option value="Changes Requested">🔄 Change Requested</option>
+              <option value="Suggestion">💡 Need another product suggestion.</option>
+              <option value="Waiting">⏳ Waiting for client response.</option>
             </select>
           </div>
 
@@ -121,7 +122,7 @@
 
           <div class="form-group">
             <label>Upload Reference (Optional)</label>
-            <input type="file" name="file_attachment" class="form-control" style="padding: 8px;">
+            <input type="file" name="file_attachment" id="file-input" class="form-control" style="padding: 8px;">
           </div>
 
           <button type="submit" id="submit-btn" class="btn btn-submit">Submit My Response</button>
@@ -136,7 +137,6 @@
   const N8N_GET_URL = 'https://n8n.admartproducts.com/webhook/get-vr';
   const N8N_POST_URL = 'https://n8n.admartproducts.com/webhook/vr-form-submit';
 
-  // 1. 將 handleStatusChange 移到最外層，確保 HTML 的 onchange 找得到它
   function handleStatusChange(val) {
     const field = document.getElementById('changes-field');
     const area = document.getElementById('change-textarea');
@@ -145,13 +145,7 @@
     if (val === 'Changes Requested' || val === 'Suggestion') {
       field.classList.remove('hidden');
       area.required = true;
-      if (val === 'Suggestion') {
-        label.textContent = "What kind of product are you looking for? *";
-        area.placeholder = "Example: I need something in blue, or a lower price point...";
-      } else {
-        label.textContent = "Description of Changes *";
-        area.placeholder = "Please specify what needs to be fixed...";
-      }
+      label.textContent = (val === 'Suggestion') ? "What product are you looking for? *" : "Description of Changes *";
     } else {
       field.classList.add('hidden');
       area.required = false;
@@ -163,74 +157,76 @@
     const params = new URLSearchParams(window.location.search);
     const pid = params.get('pid');
     const loader = document.getElementById('loading-overlay');
+    const img = document.getElementById('main-img');
+    const placeholder = document.getElementById('placeholder');
 
-    if (!pid) {
-      loader.innerHTML = '❌ Error: Missing PID in URL.<br><small>Please use the link provided in your email.</small>';
-      return;
-    }
-
-    // 2. 抓取資料
+    // Fetch data using PID
     fetch(`${N8N_GET_URL}?pid=${pid}`)
-      .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+      .then(res => res.json())
       .then(data => {
         const item = Array.isArray(data) ? data[0] : data;
         document.getElementById('info-job').textContent = item.order_number || '---';
         
         if (item.preview_image) {
-          const img = document.getElementById('main-img');
           img.src = item.preview_image;
           img.onload = () => {
-             img.classList.remove('hidden');
-             document.getElementById('placeholder').classList.add('hidden');
-             loader.classList.add('hidden');
+            img.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            loader.classList.add('hidden');
+          };
+          img.onerror = () => {
+            placeholder.textContent = 'Preview loaded, but image link is broken.';
+            loader.classList.add('hidden');
           };
         } else {
-          document.getElementById('placeholder').textContent = 'No preview available.';
+          placeholder.textContent = 'No preview available.';
           loader.classList.add('hidden');
         }
       })
       .catch(err => {
         console.error(err);
-        loader.innerHTML = '❌ Error: Could not connect to server.<br><small>Check if CORS is enabled in n8n.</small>';
+        placeholder.textContent = 'Failed to load preview details.';
+        loader.classList.add('hidden');
       });
 
-    // 3. 表單提交
+    // Form Submission (Multipart/Binary handling)
     document.getElementById('approval-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const submitBtn = document.getElementById('submit-btn');
       submitBtn.disabled = true;
       submitBtn.textContent = 'SUBMITTING...';
 
+      // Using FormData automatically handles binary file encoding and boundary headers
       const formData = new FormData();
+      formData.append('pid', pid);
       formData.append('name', this.name.value);
       formData.append('email', this.email.value);
       formData.append('status', this.status.value);
       formData.append('change_details', this.change_details.value);
-      formData.append('pid', pid);
 
-      const fileInput = this.querySelector('input[name="file_attachment"]');
+      const fileInput = document.getElementById('file-input');
       if (fileInput.files.length > 0) {
         formData.append('file_attachment', fileInput.files[0]); 
       }
 
       fetch(N8N_POST_URL, { 
         method: 'POST', 
-        body: formData 
+        body: formData // Browser sets Content-Type to multipart/form-data automatically
       })
       .then(res => {
         if (!res.ok) throw new Error();
         document.getElementById('approval-form').classList.add('hidden');
         document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       })
       .catch(err => {
-        alert('❌ Error: Could not submit your response.');
+        alert('❌ Error: Could not submit. Please check your connection.');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit My Response';
       });
     });
-  }); // 這裡補上了遺漏的括號
+  });
 </script>
-
 
 </body>
 </html>
